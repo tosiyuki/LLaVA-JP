@@ -1,0 +1,42 @@
+#!/bin/bash
+
+python train_llava.py \
+    --model_name_or_path llm-jp/llm-jp-1.3b-v1.0 \
+    --version v1 \
+    --freeze_backbone False \
+    --tune_mm_mlp_adapter False \
+    --vision_tower openai/clip-vit-large-patch14-336  \
+    --mm_vision_select_layer -2 \
+    --pretrain_mm_mlp_adapter ./output_llava/checkpoints/pretrain-llava-v1.5-llm-jp-bf/mm_projector.bin \
+    --mm_projector_type mlp2x_gelu \
+    --mm_vision_select_feature patch \
+    --data_path ./dataset/llava_visual_genome_ja.json \
+    --lazy_preprocess False \
+    --is_multimodal True \
+    --image_folder ./dataset/images \
+    --image_aspect_ratio square \
+    --optim adamw_torch \
+    --double_quant True \
+    --quant_type nf4 \
+    --bits 16 \
+    --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
+    --group_by_modality_length True \
+    --fp16 False \
+    --bf16 True \
+    --output_dir ./output_llava/checkpoints/finetuning-lora-llava-v1.5-llm-jp-bf \
+    --num_train_epochs 1 \
+    --per_device_train_batch_size 16 \
+    --per_device_eval_batch_size 2 \
+    --gradient_accumulation_steps 1 \
+    --evaluation_strategy "no" \
+    --save_strategy "steps" \
+    --save_steps 24000 \
+    --save_total_limit 1 \
+    --learning_rate 2e-4 \
+    --weight_decay 0. \
+    --warmup_ratio 0.03 \
+    --logging_steps 1 \
+    --model_max_length 1024 \
+    --gradient_checkpointing True \
+    --dataloader_num_workers 16 \
+    --lr_scheduler_type "cosine"

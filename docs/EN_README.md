@@ -1,14 +1,14 @@
 # LLaVA-JP
-LLaVAの手法を使用して[llm-jp/llm-jp-1.3b-v1.0](https://huggingface.co/llm-jp/llm-jp-1.3b-v1.0)を学習さて画像に対応したマルチモーダルなLLMを学習させる。
+Use the LLaVA method to train [llm-jp/llm-jp-1.3b-v1.0](https://huggingface.co/llm-jp/llm-jp-1.3b-v1.0) to learn VLM.
 
-LLaVA-JPの学習はRTX4090(24GB)一台で行われています。
+LLaVA-JP is learned with a single RTX4090(24GB).
 
-[English](docs/EN_README.md)
+[Japanese](../README.md)
 
-# 出力例
-## 例1 入力：猫の隣には何がありますか？
+# Output example
+## Ex.1 Input: 猫の隣には何がありますか？
 
-![猫](imgs/sample1.jpg)
+![猫](../imgs/sample1.jpg)
 
 | モデル名| 出力 |
 |:-----------|:------------|
@@ -17,8 +17,8 @@ LLaVA-JPの学習はRTX4090(24GB)一台で行われています。
 |[stabilityai/japanese-stable-vlm](https://huggingface.co/stabilityai/japanese-stable-vlm)|ノートパソコン|
 
 
-## 例2 入力：この画像の面白い点を教えてください？
-![黄色い人](imgs/sample2.jpg)
+## Ex.2 Input: この画像の面白い点を教えてください？
+![黄色い人](../imgs/sample2.jpg)
 
 | モデル名| 出力 |
 |:-----------|:------------|
@@ -27,45 +27,45 @@ LLaVA-JPの学習はRTX4090(24GB)一台で行われています。
 |[stabilityai/japanese-stable-vlm](https://huggingface.co/stabilityai/japanese-stable-vlm)|男は車の上で洗濯をしている|
 
 
-# 学習手順
+# Train
 ```
 git clone https://github.com/tosiyuki/LLava-JP.git
 ```
-## Stage1(事前学習)
+## Stage1(Pretrain)
 ```
 bash scripts/pretrain_llm_jp_1.3b_bf.sh
 ```
 
-## Stage2(ファインチューニング)
+## Stage2(Fine-tuning)
 ```
 bash scripts/finetune_llm_jp_1.3b_bf.sh
 ```
 
-## Stage2(LoRAチューニング)
+## Stage2(Fine-tuning by LoRA)
 ```
 bash scripts/finetune_lora_llm_jp.sh
 ```
 
-# 学習データ
-## Stage1(事前学習)
+# Training data
+## Stage1(Pretrain)
 - [STAIR Captions](https://github.com/STAIR-Lab-CIT/STAIR-captions)
-- LLaVA-CC3M-Pretrain-595K-JA(公開予定)
+- LLaVA-CC3M-Pretrain-595K-JA(coming soon)
 
-LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/datasets/liuhaotian/LLaVA-CC3M-Pretrain-595K)を日本語訳したデータになります。翻訳には[cyberagent/calm2-7b-chat](https://qiita.com/cyberagent/calm2-7b-chat)を使用しています。
+LLaVA-CC3M-Pretrain-595K-JA is a Japanese translation of [LLaVA-CC3M-Pretrain-595K](https://huggingface.co/datasets/liuhaotian/LLaVA-CC3M-Pretrain-595K). The translation was done using[cyberagent/calm2-7b-chat](https://qiita.com/cyberagent/calm2-7b-chat).
 
-## Stage2(ファインチューニング)
+## Stage2(Fine-tuning)
 - [Japanese Visual Genome VQA dataset](https://github.com/yahoojapan/ja-vg-vqa)
 - [LLaVA-Instruct-150K-JA](https://huggingface.co/datasets/turing-motors/LLaVA-Instruct-150K-JA)
 
 
-# 学習ログ
-![Pretrain](imgs/pretrain_loss1.png)
+# Training los
+![Pretrain](../imgs/pretrain_loss1.png)
 
-![Fine-tuning](imgs/finetuning_loss1.png)
+![Fine-tuning](../imgs/finetuning_loss1.png)
 
-# 学習済みモデルの重みの公開について
-準備できしだい公開予定です。
+# About releasing weights
+Coming soon!
 
 # Acknowledgement
-- [LLaVA](https://github.com/haotian-liu/LLaVA): LLaVA-JPを学習させるに当たりほとんどのコードがこの素晴らしいプロジェクトがベースとなっています。
-- [llm-jp](https://github.com/llm-jp): llm-jpが大規模なモデルだけではなく1.3Bという小規模で高性能なベースモデルを開発しているおかげでLLaVA-JPの学習は成功しています
+- [LLaVA](https://github.com/haotian-liu/LLaVA): Most of the code used to train LLaVA-JP is based on this excellent project.
+- [llm-jp](https://github.com/llm-jp): LLaVA-JP's learning has been successful thanks to the fact that llm-jp has developed not only a large model, but also a small, high-performance base model of 1.3B
