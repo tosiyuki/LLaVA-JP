@@ -3,7 +3,7 @@ LLaVAの手法を使用して[llm-jp/llm-jp-1.3b-v1.0](https://huggingface.co/ll
 
 LLaVA-JPの学習はRTX4090(24GB)一台で行われています。
 
-[English](docs/EN_README.md)
+[English document](docs/EN_README.md) is here.
 
 # 出力例
 ## 例1 入力：猫の隣には何がありますか？
@@ -49,7 +49,7 @@ bash scripts/finetune_lora_llm_jp.sh
 # 学習データ
 ## Stage1(事前学習)
 - [STAIR Captions](https://github.com/STAIR-Lab-CIT/STAIR-captions)
-- LLaVA-CC3M-Pretrain-595K-JA(公開予定)
+- [LLaVA-CC3M-Pretrain-595K-JA](https://huggingface.co/datasets/toshi456/LLaVA-CC3M-Pretrain-595K-JA)
 
 LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/datasets/liuhaotian/LLaVA-CC3M-Pretrain-595K)を日本語訳したデータになります。翻訳には[cyberagent/calm2-7b-chat](https://qiita.com/cyberagent/calm2-7b-chat)を使用しています。
 
@@ -69,3 +69,8 @@ LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/
 # Acknowledgement
 - [LLaVA](https://github.com/haotian-liu/LLaVA): LLaVA-JPを学習させるに当たりほとんどのコードがこの素晴らしいプロジェクトがベースとなっています。
 - [llm-jp](https://github.com/llm-jp): llm-jpが大規模なモデルだけではなく1.3Bという小規模で高性能なベースモデルを開発しているおかげでLLaVA-JPの学習は成功しています
+
+# TODO
+- [x] LLaVA-CC3M-Pretrain-595K-JAの公開
+- [] llava-jpの重み公開(モデル名は変えるかもしれません)
+- [] LoRAを使ったファインチューニングの実施

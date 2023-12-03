@@ -49,7 +49,7 @@ bash scripts/finetune_lora_llm_jp.sh
 # Training data
 ## Stage1(Pretrain)
 - [STAIR Captions](https://github.com/STAIR-Lab-CIT/STAIR-captions)
-- LLaVA-CC3M-Pretrain-595K-JA(coming soon)
+- [LLaVA-CC3M-Pretrain-595K-JA](https://huggingface.co/datasets/toshi456/LLaVA-CC3M-Pretrain-595K-JA)
 
 LLaVA-CC3M-Pretrain-595K-JA is a Japanese translation of [LLaVA-CC3M-Pretrain-595K](https://huggingface.co/datasets/liuhaotian/LLaVA-CC3M-Pretrain-595K). The translation was done using[cyberagent/calm2-7b-chat](https://qiita.com/cyberagent/calm2-7b-chat).
 
