@@ -57,14 +57,15 @@ LLaVA-CC3M-Pretrain-595K-JA is a Japanese translation of [LLaVA-CC3M-Pretrain-59
 - [Japanese Visual Genome VQA dataset](https://github.com/yahoojapan/ja-vg-vqa)
 - [LLaVA-Instruct-150K-JA](https://huggingface.co/datasets/turing-motors/LLaVA-Instruct-150K-JA)
 
+# About releasing weights
+## full training
+- [llava-jp-1.3b-v1.0](https://huggingface.co/toshi456/llava-jp-1.3b-v1.0)
 
 # Training los
 ![Pretrain](../imgs/pretrain_loss1.png)
 
 ![Fine-tuning](../imgs/finetuning_loss1.png)
 
-# About releasing weights
-Coming soon!
 
 # Acknowledgement
 - [LLaVA](https://github.com/haotian-liu/LLaVA): Most of the code used to train LLaVA-JP is based on this excellent project.

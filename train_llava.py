@@ -276,7 +276,7 @@ def train():
 
     torch.save(
         model.state_dict(),
-        f'{training_args.output_dir}/pytorch_model.pth'
+        f'{training_args.output_dir}/pytorch_model.bin'
     )
     model.config.use_cache = True
 

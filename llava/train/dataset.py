@@ -79,19 +79,6 @@ def preprocess_plain(
         tokenized_len = len(tokenizer_image_token(source[0]['value'], tokenizer))
         target[:tokenized_len] = IGNORE_INDEX
 
-    """
-    valid_tokens = [token_id for token_id in target.tolist() if token_id != IGNORE_INDEX]
-    decoded_text = tokenizer.decode(valid_tokens)
-    input_tokens = [token_id for token_id in input_ids[0].tolist() if token_id != IMAGE_TOKEN_INDEX]
-    input_decode_text = tokenizer.decode(input_tokens)
-    print('input')
-    print(input_tokens)
-    print(input_decode_text)
-    print('\ntarget')
-    print(valid_tokens)
-    print(decoded_text)
-    """
-
     return dict(input_ids=input_ids, labels=targets)
 
 
@@ -160,39 +147,6 @@ def preprocess_v1(
             target[cur_len : cur_len + instruction_len] = IGNORE_INDEX
             cur_len += round_len
         target[cur_len:] = IGNORE_INDEX
-
-        # Check Tokens
-        """
-        valid_tokens = [token_id for token_id in target.tolist() if token_id != -100]
-        decoded_text = tokenizer.decode(valid_tokens, skip_special_tokens=True)
-        input_tokens = [token_id for token_id in input_ids[0].tolist() if token_id != -200]
-        input_decode_text = tokenizer.decode(input_tokens, skip_special_tokens=True)
-        print(decoded_text)
-        print(input_decode_text)
-        """
-        """
-        print(total_len, cur_len)
-        if cur_len < tokenizer.model_max_length:
-            if cur_len+1 != total_len:
-                target[:] = IGNORE_INDEX
-                print(
-                    f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}."
-                    f" (ignored)"
-                )
-        """
-    # TODO inputはこれでいい？
-    #print('input')
-    #print(tokenizer.decode(input_ids[0]))
-    #print('target')
-    #print(targets[0])
-    """
-    valid_tokens = [token_id for token_id in target.tolist() if token_id != IGNORE_INDEX]
-    decoded_text = tokenizer.decode(valid_tokens)
-    input_tokens = [token_id for token_id in input_ids[0].tolist() if token_id != IMAGE_TOKEN_INDEX]
-    input_decode_text = tokenizer.decode(input_tokens)
-    print(decoded_text)
-    print(input_decode_text)
-    """
 
     return dict(
         input_ids=input_ids,

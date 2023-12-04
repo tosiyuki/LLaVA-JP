@@ -57,14 +57,14 @@ LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/
 - [Japanese Visual Genome VQA dataset](https://github.com/yahoojapan/ja-vg-vqa)
 - [LLaVA-Instruct-150K-JA](https://huggingface.co/datasets/turing-motors/LLaVA-Instruct-150K-JA)
 
+# 学習済みモデルの重み
+## full training
+- [llava-jp-1.3b-v1.0](https://huggingface.co/toshi456/llava-jp-1.3b-v1.0)
 
 # 学習ログ
 ![Pretrain](imgs/pretrain_loss1.png)
 
 ![Fine-tuning](imgs/finetuning_loss1.png)
-
-# 学習済みモデルの重みの公開について
-準備できしだい公開予定です。
 
 # Acknowledgement
 - [LLaVA](https://github.com/haotian-liu/LLaVA): LLaVA-JPを学習させるに当たりほとんどのコードがこの素晴らしいプロジェクトがベースとなっています。
@@ -72,5 +72,5 @@ LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/
 
 # TODO
 - [x] LLaVA-CC3M-Pretrain-595K-JAの公開
-- [] llava-jpの重み公開(モデル名は変えるかもしれません)
-- [] LoRAを使ったファインチューニングの実施
+- [x] llava-jpの重み公開(モデル名は変えるかもしれません)
+- [ ] LoRAを使ったファインチューニングの実施
