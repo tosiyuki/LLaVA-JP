@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 
 from transformers import AutoConfig, AutoModelForCausalLM, \
-                         GPTNeoXModel, GPTNeoXForCausalLM, GPTNeoXConfig
+                         GPTNeoXModel, GPTNeoXForCausalLM, GPTNeoXConfig, PreTrainedModel
 
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
@@ -37,7 +37,7 @@ class LlavaGptNeoxModel(LlavaMetaModel, GPTNeoXModel):
         super(LlavaGptNeoxModel, self).__init__(config)
 
 
-class LlavaGptNeoxForCausalLM(GPTNeoXForCausalLM, LlavaMetaForCausalLM):
+class LlavaGptNeoxForCausalLM(PreTrainedModel, LlavaMetaForCausalLM):
     config_class = LlavaConfig
     base_model = "gpt_neox"
 

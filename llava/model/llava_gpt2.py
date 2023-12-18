@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 
 from transformers import AutoConfig, AutoModelForCausalLM, \
-                         GPT2LMHeadModel, GPT2Config
+                         GPT2LMHeadModel, GPT2Config, PreTrainedModel
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from llava.model.llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 
@@ -28,7 +28,7 @@ class LlavaConfig(GPT2Config):
     model_type = "llava"
 
 
-class LlavaGpt2Model(LlavaMetaModel, GPT2LMHeadModel):
+class LlavaGpt2Model(LlavaMetaModel, PreTrainedModel):
     config_class = LlavaConfig
 
     def __init__(self, config: GPT2Config):
@@ -42,6 +42,7 @@ class LlavaGpt2ForCausalLM(GPT2LMHeadModel, LlavaMetaForCausalLM):
     def __init__(self, config):
         super(LlavaGpt2ForCausalLM, self).__init__(config)
         self.model = LlavaGpt2Model(config)
+        #self.model = LlavaMetaModel(config)
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 

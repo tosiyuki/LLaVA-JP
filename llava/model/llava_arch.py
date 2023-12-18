@@ -26,6 +26,7 @@ class LlavaMetaModel:
 
     def __init__(self, config):
         super(LlavaMetaModel, self).__init__(config)
+        #self.config = config
 
         if hasattr(config, "mm_vision_tower"):
             self.initialize_vision_modules(config)
@@ -92,13 +93,12 @@ class LlavaMetaForCausalLM(ABC):
     
     def embed(self, input_ids):
         if self.base_model == "gpt2":
-            return self.get_model().transformer.wte(input_ids)
+            return self.transformer.wte(input_ids)
         elif self.base_model == "gpt_neox":
-            return self.get_model().embed_in(input_ids) # NeoX
+            return self.embed_in(input_ids) # NeoX
         elif self.base_model == "llama":
             return self.get_model().embed_tokens(input_ids) # Llama
 
-    # TODO
     def prepare_inputs_labels_for_multimodal(
         self, input_ids, position_ids, attention_mask, past_key_values, labels, images
     ):
