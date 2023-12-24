@@ -12,7 +12,7 @@ LLaVA-JPの学習はRTX4090(24GB)一台で行われています。
 
 | モデル名| 出力 |
 |:-----------|:------------|
-|llava-jp| ノートパソコン|
+|[llava-jp](https://huggingface.co/toshi456/llava-jp-1.3b-v1.0)| ノートパソコン|
 |[turing-motors/heron-chat-blip-ja-stablelm-base-7b-v0](https://huggingface.co/turing-motors/heron-chat-blip-ja-stablelm-base-7b-v0)|猫はノートパソコンの上に座っている。|
 |[stabilityai/japanese-stable-vlm](https://huggingface.co/stabilityai/japanese-stable-vlm)|ノートパソコン|
 
@@ -58,6 +58,8 @@ LLaVA-CC3M-Pretrain-595K-JAは[LLaVA-CC3M-Pretrain-595K](https://huggingface.co/
 - [LLaVA-Instruct-150K-JA](https://huggingface.co/datasets/turing-motors/LLaVA-Instruct-150K-JA)
 
 # 学習済みモデルの重み
+## Pretrained
+- [llava-pretrain-jp-1.3b-v1.0](https://huggingface.co/toshi456/llava-pretrain-jp-1.3b-v1.0)
 ## full training
 - [llava-jp-1.3b-v1.0](https://huggingface.co/toshi456/llava-jp-1.3b-v1.0)
 
