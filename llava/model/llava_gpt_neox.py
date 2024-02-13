@@ -27,7 +27,7 @@ from llava.model.llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 
 
 class LlavaConfig(GPTNeoXConfig):
-    model_type = "llava"
+    model_type = "llava-jp"
 
 
 class LlavaGptNeoxModel(LlavaMetaModel, GPTNeoXModel):
@@ -108,5 +108,5 @@ class LlavaGptNeoxForCausalLM(PreTrainedModel, LlavaMetaForCausalLM):
             _inputs['images'] = images
         return _inputs
 
-AutoConfig.register("llava", LlavaConfig)
+AutoConfig.register("llava-jp", LlavaConfig)
 AutoModelForCausalLM.register(LlavaConfig, LlavaGptNeoxForCausalLM)
