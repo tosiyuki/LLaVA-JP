@@ -16,7 +16,7 @@ if __name__ == "__main__":
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     model_path = 'toshi456/llava-jp-1.3b-v1.0'
-    model_args.vision_tower = "openai/clip-vit-large-patch14-336"
+    #model_path = 'toshi456/llava-jp-1.3b-v1.0-siglip-so400m-patch14-384'
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.bfloat16 if device=="cuda" else torch.float32
 

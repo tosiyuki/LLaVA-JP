@@ -25,7 +25,7 @@ from llava.model.llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 
 
 class LlavaConfig(GPT2Config):
-    model_type = "llava"
+    model_type = "llava-jp"
 
 
 class LlavaGpt2Model(LlavaMetaModel, PreTrainedModel):
@@ -107,5 +107,5 @@ class LlavaGpt2ForCausalLM(GPT2LMHeadModel, LlavaMetaForCausalLM):
             _inputs['images'] = images
         return _inputs
 
-AutoConfig.register("llava", LlavaConfig)
+AutoConfig.register("llava-jp", LlavaConfig)
 AutoModelForCausalLM.register(LlavaConfig, LlavaGpt2ForCausalLM)

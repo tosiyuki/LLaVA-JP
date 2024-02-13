@@ -16,7 +16,7 @@ parser = transformers.HfArgumentParser(
     (ModelArguments, DataArguments, TrainingArguments))
 model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 model_path = 'toshi456/llava-jp-1.3b-v1.0'
-model_args.vision_tower = "openai/clip-vit-large-patch14-336"
+#model_path = 'toshi456/llava-jp-1.3b-v1.0-siglip-so400m-patch14-384'
 
 model = LlavaGpt2ForCausalLM.from_pretrained(
     model_path, 
