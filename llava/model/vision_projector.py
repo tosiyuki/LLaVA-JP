@@ -37,11 +37,10 @@ class TokenDownLayer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, num_tokens, c = x.shape
         h = int(math.sqrt(num_tokens))
-        #assert h * h == num_tokens
         if h * h == num_tokens:
             x = x.permute(0, 2, 1).reshape(b, -1, h, h)
         else:
-            # TODO これで動くけど検証は必要
+            # FIXME サイズによっては失敗する
             w = int(num_tokens/h)
             assert w*h == num_tokens
             x = x.permute(0, 2, 1).reshape(b, -1, w, h)
