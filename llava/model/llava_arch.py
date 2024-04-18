@@ -47,12 +47,14 @@ class LlavaMetaModel:
         pretrain_mm_mlp_adapter = model_args.pretrain_mm_mlp_adapter if hasattr(model_args, "pretrain_mm_mlp_adapter") else None
 
         self.config.mm_vision_tower = vision_tower
+        self.config.scales = model_args.scales
 
         self.vision_tower = CLIPVisionTower(
             vision_tower, 
             mm_vision_select_layer,
             mm_vision_select_feature,
-            delay_load=True
+            delay_load=True,
+            scales=model_args.scales,
         )
         self.vision_tower.load_model()
 

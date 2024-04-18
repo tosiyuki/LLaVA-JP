@@ -15,8 +15,8 @@ if __name__ == "__main__":
     parser = transformers.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    model_path = 'toshi456/llava-jp-1.3b-v1.0'
-    #model_path = 'toshi456/llava-jp-1.3b-v1.0-siglip-so400m-patch14-384'
+    #model_path = 'toshi456/llava-jp-1.3b-v1.0'
+    model_path = 'output_llava/checkpoints/finetune-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384'
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.bfloat16 if device=="cuda" else torch.float32
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     )
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_path,
-        model_max_length=1024,
+        model_max_length=1532,
         padding_side="right",
         use_fast=False,
     )
@@ -41,10 +41,23 @@ if __name__ == "__main__":
     # image pre-process
     image_url = "https://huggingface.co/rinna/bilingual-gpt-neox-4b-minigpt4/resolve/main/sample.jpg"
     image = Image.open(requests.get(image_url, stream=True).raw).convert('RGB')
+    
+    image_size = model.get_model().vision_tower.image_processor.size["height"]
+    if model.get_model().vision_tower.scales is not None:
+        image_size = model.get_model().vision_tower.image_processor.size["height"] * len(model.get_model().vision_tower.scales)
+    
     if device == "cuda":
-        image_tensor = model.get_model().vision_tower.image_processor(image, return_tensors='pt')['pixel_values'].half().cuda().to(torch_dtype)
+        image_tensor = model.get_model().vision_tower.image_processor(
+            image, 
+            return_tensors='pt', 
+            size={"height": image_size, "width": image_size}
+        )['pixel_values'].half().cuda().to(torch_dtype)
     else:
-        image_tensor = model.get_model().vision_tower.image_processor(image, return_tensors='pt')['pixel_values'].to(torch_dtype)
+        image_tensor = model.get_model().vision_tower.image_processor(
+            image, 
+            return_tensors='pt', 
+            size={"height": image_size, "width": image_size}
+        )['pixel_values'].to(torch_dtype)
 
     # create prompt
     # ユーザー: <image>\n{prompt}

@@ -15,8 +15,8 @@ torch_dtype = torch.bfloat16 if device=="cuda" else torch.float32
 parser = transformers.HfArgumentParser(
     (ModelArguments, DataArguments, TrainingArguments))
 model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-model_path = 'toshi456/llava-jp-1.3b-v1.0'
-#model_path = 'toshi456/llava-jp-1.3b-v1.0-siglip-so400m-patch14-384'
+#model_path = 'toshi456/llava-jp-1.3b-v1.0'
+model_path = 'output_llava/checkpoints/finetune-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384'
 
 model = LlavaGpt2ForCausalLM.from_pretrained(
     model_path, 
@@ -46,10 +46,22 @@ def inference_fn(
     ):
     # prepare inputs
     # image pre-process
+    image_size = model.get_model().vision_tower.image_processor.size["height"]
+    if model.get_model().vision_tower.scales is not None:
+        image_size = model.get_model().vision_tower.image_processor.size["height"] * len(model.get_model().vision_tower.scales)
+
     if device == "cuda":
-        image_tensor = model.get_model().vision_tower.image_processor(image, return_tensors='pt')['pixel_values'].half().cuda().to(torch_dtype)
+        image_tensor = model.get_model().vision_tower.image_processor(
+            image, 
+            return_tensors='pt', 
+            size={"height": image_size, "width": image_size}
+        )['pixel_values'].half().cuda().to(torch_dtype)
     else:
-        image_tensor = model.get_model().vision_tower.image_processor(image, return_tensors='pt')['pixel_values'].to(torch_dtype)
+        image_tensor = model.get_model().vision_tower.image_processor(
+            image, 
+            return_tensors='pt', 
+            size={"height": image_size, "width": image_size}
+        )['pixel_values'].to(torch_dtype)
 
     # create prompt
     inp = DEFAULT_IMAGE_TOKEN + '\n' + prompt
@@ -73,7 +85,7 @@ def inference_fn(
     output_ids = model.generate(
             inputs=input_ids,
             images=image_tensor,
-            do_sample=True,
+            do_sample= temperature != 0.0,
             temperature=temperature,
             top_p=top_p,
             max_new_tokens=max_len,
@@ -108,7 +120,7 @@ with gr.Blocks() as demo:
                 )
                 
                 temperature = gr.Slider(
-                    minimum=0.1,
+                    minimum=0.0,
                     maximum=1.0,
                     value=0.1,
                     step=0.1,

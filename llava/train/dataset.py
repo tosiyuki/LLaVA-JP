@@ -177,16 +177,20 @@ def preprocess(
 class LazySupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
-    def __init__(self, data_path: str,
-                 tokenizer: transformers.PreTrainedTokenizer,
-                 data_args: DataArguments):
+    def __init__(
+        self, data_path: str,
+        tokenizer: transformers.PreTrainedTokenizer,
+        data_args: DataArguments,
+    ):
         super(LazySupervisedDataset, self).__init__()
         
         list_data_dict = json.load(open(data_path, "r"))
 
+        from pathlib import Path
+
         print("Formatting inputs...Skip in lazy mode")
         self.tokenizer = tokenizer
-        self.list_data_dict = list_data_dict
+        self.list_data_dict = [i for i in list_data_dict if Path(data_args.image_folder, i['image']).is_file()]
         self.data_args = data_args
 
     def __len__(self):
@@ -233,9 +237,17 @@ class LazySupervisedDataset(Dataset):
                         result.paste(pil_img, ((height - width) // 2, 0))
                         return result
                 image = expand2square(image, tuple(int(x*255) for x in processor.image_mean))
-                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+                image = processor.preprocess(
+                    image, 
+                    return_tensors='pt', 
+                    size={"height": self.data_args.image_size, "width": self.data_args.image_size}
+                )['pixel_values'][0]
             else:
-                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+                image = processor.preprocess(
+                    image, 
+                    return_tensors='pt', 
+                    size={"height": self.data_args.image_size, "width": self.data_args.image_size}
+                )['pixel_values'][0]
             sources = preprocess_multimodal(
                 copy.deepcopy([e["conversations"] for e in sources]),
                 self.data_args
