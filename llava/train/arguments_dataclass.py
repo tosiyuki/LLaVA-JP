@@ -17,6 +17,7 @@ class ModelArguments:
     pretrain_mm_mlp_adapter: Optional[str] = field(default=None) # fine-tuningのときには設定
     mm_projector_type: Optional[str] = field(default='mlp2x_gelu') # 2層の線形層
     mm_vision_select_feature: Optional[str] = field(default="patch")
+    scales: Optional[list[float]] = field(default=None)
 
 
 @dataclass
@@ -28,6 +29,7 @@ class DataArguments:
     image_folder: Optional[str] = field(default="/home/toshi/work/llava_jp/input/LLaVA-CC3M-Pretrain-595K/images",
                                         metadata={"help": "Path to image data."})
     image_aspect_ratio: str = 'square'
+    image_size: Optional[int] = None
 
 
 @dataclass
