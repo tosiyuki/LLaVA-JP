@@ -47,7 +47,7 @@ class LlavaMetaModel:
         pretrain_mm_mlp_adapter = model_args.pretrain_mm_mlp_adapter if hasattr(model_args, "pretrain_mm_mlp_adapter") else None
 
         self.config.mm_vision_tower = vision_tower
-        self.config.scales = model_args.scales
+        self.config.scales = model_args.scales if hasattr(model_args, 'scales') else None
 
         self.vision_tower = CLIPVisionTower(
             vision_tower, 

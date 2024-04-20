@@ -15,8 +15,7 @@ if __name__ == "__main__":
     parser = transformers.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    #model_path = 'toshi456/llava-jp-1.3b-v1.0'
-    model_path = 'output_llava/checkpoints/finetune-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384'
+    model_path = 'toshi456/llava-jp-1.3b-v1.1'
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.bfloat16 if device=="cuda" else torch.float32
 
@@ -87,7 +86,7 @@ if __name__ == "__main__":
             inputs=input_ids,
             images=image_tensor,
             do_sample=True,
-            temperature=0.01,
+            temperature=0.1,
             top_p=1.0,
             max_new_tokens=256,
             streamer=streamer,
