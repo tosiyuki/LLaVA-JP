@@ -9,11 +9,13 @@ python train_llava.py \
     --mm_vision_select_layer -2 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_feature patch \
-    --data_path ./dataset/llava_pretrain_stair.json \
+    --scales 1.0 0.5 \
+    --data_path ./dataset/llava_pretrain_blip_laion_cc_sbu_558k_ja.json \
     --lazy_preprocess False \
     --is_multimodal True \
-    --image_folder ./dataset/images \
+    --image_folder ~/datasets/images \
     --image_aspect_ratio square \
+    --image_size 768 \
     --optim adamw_torch \
     --double_quant True \
     --quant_type nf4 \
@@ -22,11 +24,11 @@ python train_llava.py \
     --group_by_modality_length False \
     --fp16 False \
     --bf16 True \
-    --output_dir ./output_llava/checkpoints/pretrain-llava-v1.5-llm-jp-siglip-so400m-patch14-384-llava-stair \
+    --output_dir ./output_llava/checkpoints/pretrain-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384 \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 4 \
+    --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 8 \
+    --gradient_accumulation_steps 4 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 24000 \

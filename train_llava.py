@@ -112,9 +112,11 @@ def find_all_linear_names(model):
 def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
                                 data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    train_dataset = LazySupervisedDataset(tokenizer=tokenizer,
-                                data_path=data_args.data_path,
-                                data_args=data_args)
+    train_dataset = LazySupervisedDataset(
+        tokenizer=tokenizer,
+        data_path=data_args.data_path,
+        data_args=data_args
+    )
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
     return dict(train_dataset=train_dataset,
                 eval_dataset=None,
@@ -261,6 +263,8 @@ def train():
                     if training_args.bf16 and module.weight.dtype == torch.float32:
                         module = module.to(torch.bfloat16)
 
+    if data_args.image_size is None:
+        data_args.image_size = data_args.image_processor.size["height"]
     data_module = make_supervised_data_module(tokenizer=tokenizer,
                                               data_args=data_args)
     trainer = LLaVATrainer(model=model,
@@ -274,10 +278,10 @@ def train():
         trainer.train()
     trainer.save_state()
 
-    torch.save(
-        model.state_dict(),
-        f'{training_args.output_dir}/pytorch_model.bin'
-    )
+    #torch.save(
+    #    model.state_dict(),
+    #    f'{training_args.output_dir}/pytorch_model.bin'
+    #)
     model.config.use_cache = True
 
     if training_args.lora_enable:

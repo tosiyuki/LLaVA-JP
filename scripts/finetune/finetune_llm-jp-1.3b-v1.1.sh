@@ -2,36 +2,39 @@
 
 python train_llava.py \
     --model_name_or_path llm-jp/llm-jp-1.3b-v1.0 \
-    --version plain \
+    --version v1 \
     --freeze_backbone False \
-    --tune_mm_mlp_adapter True \
-    --vision_tower openai/clip-vit-large-patch14-336 \
+    --tune_mm_mlp_adapter False \
+    --vision_tower google/siglip-so400m-patch14-384 \
     --mm_vision_select_layer -2 \
+    --pretrain_mm_mlp_adapter ./output_llava/checkpoints/pretrain-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384/mm_projector.bin \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_feature patch \
-    --data_path ./dataset/llava_pretrain_stair.json \
+    --scales 1.0 0.5 \
+    --data_path ./dataset/llava_v1_5_instruct_620k_ja_v2.json \
     --lazy_preprocess False \
     --is_multimodal True \
-    --image_folder ./dataset/images \
+    --image_folder ~/datasets \
     --image_aspect_ratio square \
-    --optim adamw_torch \
+    --image_size 768 \
+    --optim adamw_bnb_8bit \
     --double_quant True \
     --quant_type nf4 \
     --bits 16 \
     --lora_enable False \
-    --group_by_modality_length False \
+    --group_by_modality_length True \
     --fp16 False \
     --bf16 True \
-    --output_dir ./output_llava/checkpoints/pretrain-llava-v1.5-llm-jp-bf_pretrain_stair \
+    --output_dir ./output_llava/checkpoints/finetune-llava-jp-1.3b-v1.1-siglip-so400m-patch14-384 \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 4 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 8 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 2 \
+    --gradient_accumulation_steps 16 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 24000 \
     --save_total_limit 1 \
-    --learning_rate 1e-3 \
+    --learning_rate 2e-5 \
     --weight_decay 0. \
     --warmup_ratio 0.03 \
     --logging_steps 1 \
