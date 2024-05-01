@@ -192,6 +192,18 @@ conv_vicuna_v1 = Conversation(
     sep2="<EOD|LLM-jp>", # if you use llm-jp : <EOD|LLM-jp>, gpt2 and gpt_neox: </s>
 )
 
+conv_karasu = Conversation(
+    system="これは好奇心旺盛なユーザーと人工知能システムのチャットです。"
+    "システムはユーザーの質問に親切、詳細、丁寧に答える。",
+    roles=("ユーザー", "システム"),
+    version="karasu",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.TWO,
+    sep=" ",
+    sep2="</s>",
+)
+
 conv_llava_plain = Conversation(
     system="",
     roles=("", ""),
@@ -205,6 +217,7 @@ conv_llava_plain = Conversation(
 default_conversation = conv_llava_plain
 conv_templates = {
     "v1": conv_vicuna_v1,
+    "karasu": conv_karasu,
     "plain": conv_llava_plain,
 }
 
