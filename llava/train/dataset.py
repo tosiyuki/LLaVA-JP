@@ -85,7 +85,8 @@ def preprocess_plain(
 def preprocess_v1(
     sources,
     tokenizer: transformers.PreTrainedTokenizer,
-    has_image: bool = False
+    has_image: bool = False,
+    init_curlen: int = 0
 ) -> Dict:
     conv = conversation_lib.default_conversation.copy()
     roles = {"ユーザー": conv.roles[0], "システム": conv.roles[1]}
@@ -126,7 +127,7 @@ def preprocess_v1(
         total_len = int(target.ne(tokenizer.pad_token_id).sum())
 
         rounds = conversation.split(conv.sep2)
-        cur_len = 0 #1
+        cur_len = init_curlen #1
         target[:cur_len] = IGNORE_INDEX
         for i, rou in enumerate(rounds):
             if rou == "":
@@ -169,7 +170,7 @@ def preprocess(
     if conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.PLAIN:
         return preprocess_plain(sources, tokenizer)
     elif conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.TWO:
-        return preprocess_v1(sources, tokenizer, has_image)
+        return preprocess_v1(sources, tokenizer, has_image, conversation_lib.default_conversation.cur_len)
     else:
         raise ValueError(f"Invalid style: {conversation_lib.default_conversation.sep_style}")
 
