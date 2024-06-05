@@ -42,7 +42,6 @@ class LlavaGpt2ForCausalLM(GPT2LMHeadModel, LlavaMetaForCausalLM):
     def __init__(self, config):
         super(LlavaGpt2ForCausalLM, self).__init__(config)
         self.model = LlavaGpt2Model(config)
-        #self.model = LlavaMetaModel(config)
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 

@@ -19,6 +19,7 @@ import torch
 
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX
 from llava.model.clip_encoder import CLIPVisionTower
+from llava.model.convnext_clip_encoder import ConvNeXtCLIPVisionTower
 from llava.model.vision_projector import get_vision_projector
 
 
@@ -26,7 +27,6 @@ class LlavaMetaModel:
 
     def __init__(self, config):
         super(LlavaMetaModel, self).__init__(config)
-        #self.config = config
 
         if hasattr(config, "mm_vision_tower"):
             self.initialize_vision_modules(config)
@@ -41,6 +41,9 @@ class LlavaMetaModel:
         return vision_tower
 
     def initialize_vision_modules(self, model_args):
+        if "hf-hub:" in getattr(model_args, 'mm_vision_tower', ""):
+            # FIXME open_clipのconvnextがパラメータ名の関係でロードが失敗するので一時的な対策
+            model_args.mm_vision_tower = "convnext_large"
         vision_tower = model_args.vision_tower if hasattr(model_args, "vision_tower") else model_args.mm_vision_tower
         mm_vision_select_layer = model_args.mm_vision_select_layer
         mm_vision_select_feature = model_args.mm_vision_select_feature
@@ -49,20 +52,48 @@ class LlavaMetaModel:
         self.config.mm_vision_tower = vision_tower
         self.config.scales = model_args.scales if hasattr(model_args, 'scales') else None
 
-        self.vision_tower = CLIPVisionTower(
-            vision_tower, 
-            mm_vision_select_layer,
-            mm_vision_select_feature,
-            delay_load=True,
-            scales=model_args.scales,
-        )
-        self.vision_tower.load_model()
+        self.config.vision_encoder_type = model_args.vision_encoder_type if hasattr(model_args, 'vision_encoder_type') else None
+        if not self.config.vision_encoder_type:
+            # Before ver 1.1
+            self.vision_tower = CLIPVisionTower(
+                vision_tower, 
+                mm_vision_select_layer,
+                mm_vision_select_feature,
+                delay_load=True,
+                scales=model_args.scales,
+            )
+        else:
+            # After ver 1.2
+            if model_args.vision_encoder_type == "CLIP":
+                self.vision_tower = CLIPVisionTower(
+                    vision_tower, 
+                    mm_vision_select_layer,
+                    mm_vision_select_feature,
+                    delay_load=True,
+                    scales=model_args.scales,
+                )
+            elif model_args.vision_encoder_type == "ConvNeXt":
+                self.vision_tower = ConvNeXtCLIPVisionTower(
+                    model_args,
+                    vision_tower, 
+                    delay_load=True,
+                )
+                self.config.mm_vision_resolution = model_args.mm_vision_resolution
+                self.config.vision_add_five_stage = model_args.vision_add_five_stage
+                self.config.vision_five_stage_width = model_args.vision_five_stage_width
+                self.config.drop_path_rates = model_args.drop_path_rates
+            else:
+                raise ValueError(f"model_args.vision_encoder_type: {model_args.vision_encoder_type} not find")
+        
+        if self.vision_tower.is_loaded is False:
+            self.vision_tower.load_model()
 
         self.config.use_mm_proj = True
         self.config.mm_projector_type = getattr(model_args, 'mm_projector_type', 'linear')
         self.config.mm_hidden_size = self.vision_tower.hidden_size
         self.config.mm_vision_select_layer = mm_vision_select_layer
         self.config.mm_vision_select_feature = mm_vision_select_feature
+        self.config.vision_encoder_type = model_args.vision_encoder_type
 
         self.mm_projector = get_vision_projector(self.config)
 

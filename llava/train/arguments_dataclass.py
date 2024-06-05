@@ -18,6 +18,15 @@ class ModelArguments:
     mm_projector_type: Optional[str] = field(default='mlp2x_gelu') # 2層の線形層
     mm_vision_select_feature: Optional[str] = field(default="patch")
     scales: Optional[list[float]] = field(default=None)
+    vision_encoder_type: str = field(default="CLIP")
+    tune_vision_tower: bool  = field(default=False)
+
+    # ConvNeXt setting
+    mm_vision_resolution: int = field(default=768)
+    vision_add_five_stage: int = field(default=3)
+    vision_five_stage_width: int = field(default=1536)
+    drop_path_rates: Optional[list[float]] = field(default=None)
+    tune_convnext_stage: Optional[list[str]] = field(default=None)
 
 
 @dataclass

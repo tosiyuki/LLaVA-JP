@@ -8,6 +8,7 @@ class SeparatorStyle(Enum):
     SINGLE = auto()
     PLAIN = auto()
     TWO = auto()
+    KARASU = auto()
 
 
 @dataclasses.dataclass
@@ -21,6 +22,7 @@ class Conversation:
     sep: str = "###"
     sep2: str = None
     version: str = "Unknown"
+    cur_len: int = 0
 
     skip_next: bool = False
 
@@ -51,6 +53,27 @@ class Conversation:
                     ret += role + ": " + message + seps[i % 2]
                 else:
                     ret += role + ": "
+        elif self.sep_style == SeparatorStyle.KARASU:
+            wrap_sys = lambda msg: f"<<SYS>>\n{msg}\n<</SYS>>\n\n"
+            wrap_inst = lambda msg: f"[INST] {msg} [/INST]"
+            ret = ""
+
+            for i, (role, message) in enumerate(messages):
+                if i == 0:
+                    assert message, "first message should not be none"
+                    assert role == self.roles[0], "first message should come from user"
+                if message:
+                    if type(message) is tuple:
+                        message, _, _ = message
+                    if i == 0: message = wrap_sys(self.system) + message
+                    if i % 2 == 0:
+                        message = wrap_inst(message)
+                        ret += self.sep + message
+                    else:
+                        ret += " " + message + " " + self.sep2
+                else:
+                    ret += ""
+            ret = ret.lstrip(self.sep)
         elif self.sep_style == SeparatorStyle.PLAIN:
             seps = [self.sep, self.sep2]
             ret = self.system
@@ -190,6 +213,20 @@ conv_vicuna_v1 = Conversation(
     sep_style=SeparatorStyle.TWO,
     sep=" ",
     sep2="<EOD|LLM-jp>", # if you use llm-jp : <EOD|LLM-jp>, gpt2 and gpt_neox: </s>
+    cur_len=0
+)
+
+conv_karasu = Conversation(
+    system="これは好奇心旺盛なユーザーと人工知能システムのチャットです。"
+    "システムはユーザーの質問に親切、詳細、丁寧に答える。",
+    roles=("ユーザー", "システム"),
+    version="karasu",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.TWO,
+    sep=" ",
+    sep2="</s>",
+    cur_len=1
 )
 
 conv_llava_plain = Conversation(
@@ -205,6 +242,7 @@ conv_llava_plain = Conversation(
 default_conversation = conv_llava_plain
 conv_templates = {
     "v1": conv_vicuna_v1,
+    "karasu": conv_karasu,
     "plain": conv_llava_plain,
 }
 

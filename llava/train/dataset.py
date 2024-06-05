@@ -12,10 +12,13 @@ import transformers
 
 from PIL import Image
 from torch.utils.data import Dataset
+from torchvision.transforms.transforms import Compose
 
 from llava import conversation as conversation_lib
 from llava.constants import DEFAULT_IMAGE_TOKEN, IGNORE_INDEX, IMAGE_TOKEN_INDEX
 from llava.train.arguments_dataclass import DataArguments
+
+Image.MAX_IMAGE_PIXELS = 1000000000
 
 
 def tokenizer_image_token(prompt, tokenizer, image_token_index=IMAGE_TOKEN_INDEX, return_tensors=None):
@@ -85,7 +88,8 @@ def preprocess_plain(
 def preprocess_v1(
     sources,
     tokenizer: transformers.PreTrainedTokenizer,
-    has_image: bool = False
+    has_image: bool = False,
+    init_curlen: int = 0
 ) -> Dict:
     conv = conversation_lib.default_conversation.copy()
     roles = {"ユーザー": conv.roles[0], "システム": conv.roles[1]}
@@ -126,7 +130,7 @@ def preprocess_v1(
         total_len = int(target.ne(tokenizer.pad_token_id).sum())
 
         rounds = conversation.split(conv.sep2)
-        cur_len = 0 #1
+        cur_len = init_curlen #1
         target[:cur_len] = IGNORE_INDEX
         for i, rou in enumerate(rounds):
             if rou == "":
@@ -169,7 +173,7 @@ def preprocess(
     if conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.PLAIN:
         return preprocess_plain(sources, tokenizer)
     elif conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.TWO:
-        return preprocess_v1(sources, tokenizer, has_image)
+        return preprocess_v1(sources, tokenizer, has_image, conversation_lib.default_conversation.cur_len)
     else:
         raise ValueError(f"Invalid style: {conversation_lib.default_conversation.sep_style}")
 
@@ -223,6 +227,7 @@ class LazySupervisedDataset(Dataset):
             image_folder = self.data_args.image_folder
             processor = self.data_args.image_processor
             image = Image.open(os.path.join(image_folder, image_file)).convert('RGB')
+            
             if self.data_args.image_aspect_ratio == 'pad':
                 def expand2square(pil_img, background_color):
                     width, height = pil_img.size
@@ -237,17 +242,23 @@ class LazySupervisedDataset(Dataset):
                         result.paste(pil_img, ((height - width) // 2, 0))
                         return result
                 image = expand2square(image, tuple(int(x*255) for x in processor.image_mean))
-                image = processor.preprocess(
-                    image, 
-                    return_tensors='pt', 
-                    size={"height": self.data_args.image_size, "width": self.data_args.image_size}
-                )['pixel_values'][0]
+                if isinstance(processor, Compose):
+                    image = processor(image)
+                else:
+                    image = processor.preprocess(
+                        image, 
+                        return_tensors='pt', 
+                        size={"height": self.data_args.image_size, "width": self.data_args.image_size}
+                    )['pixel_values'][0]
             else:
-                image = processor.preprocess(
-                    image, 
-                    return_tensors='pt', 
-                    size={"height": self.data_args.image_size, "width": self.data_args.image_size}
-                )['pixel_values'][0]
+                if isinstance(processor, Compose):
+                    image = processor(image)
+                else:
+                    image = processor.preprocess(
+                        image, 
+                        return_tensors='pt', 
+                        size={"height": self.data_args.image_size, "width": self.data_args.image_size}
+                    )['pixel_values'][0]
             sources = preprocess_multimodal(
                 copy.deepcopy([e["conversations"] for e in sources]),
                 self.data_args
