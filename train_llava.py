@@ -63,7 +63,7 @@ def safe_save_model_for_hf_trainer(trainer: transformers.Trainer,
                                    output_dir: str):
     """Collects the state dict and dump to disk."""
 
-    if getattr(trainer.args, "tune_mm_mlp_adapter", False):
+    if getattr(trainer.args, "tune_mm_mlp_adapter", False) and getattr(trainer.args, 'tune_convnext_stage', None) is None:
         # Only save Adapter
         keys_to_match = ['mm_projector']
         if getattr(trainer.args, "use_im_start_end", False):
@@ -85,8 +85,17 @@ def safe_save_model_for_hf_trainer(trainer: transformers.Trainer,
 
     state_dict = trainer.model.state_dict()
     if trainer.args.should_save:
+        # parameterのnameにgammaやbetaが入っているとfrom_pretrainedでロードする際、
+        # 以下のような_fix_keyメソッドがあり正常に重みをロードできない.
+        # def _fix_key(key):
+        #    if "beta" in key:
+        #        return key.replace("beta", "bias")
+        #    if "gamma" in key:
+        #        return key.replace("gamma", "weight")
+        #    return key
+        # gammaをweightに置き換える
         cpu_state_dict = {
-            key: value.cpu()
+            key.replace("gamma", "weight"): value.cpu()
             for key, value in state_dict.items()
         }
         del state_dict
@@ -228,9 +237,10 @@ def train():
     tokenizer.pad_token = tokenizer.unk_token
     conversation_lib.default_conversation = conversation_lib.conv_templates[model_args.version]
 
-    model.get_model().initialize_vision_modules(
-        model_args=model_args,
-    )
+    if model.get_model().vision_tower is None:
+        model.get_model().initialize_vision_modules(
+            model_args=model_args,
+        )
     
     vision_tower = model.get_vision_tower()
     vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
@@ -246,6 +256,20 @@ def train():
         model.requires_grad_(False)
         for p in model.get_model().mm_projector.parameters():
             p.requires_grad = True
+
+    model.get_vision_tower().vision_tower.requires_grad_(model_args.tune_vision_tower)
+
+    training_args.tune_convnext_stage = model_args.tune_convnext_stage
+    if model_args.tune_convnext_stage is not None:
+        model.get_vision_tower().vision_tower.requires_grad_(False)
+        for name, layer in model.get_vision_tower().vision_tower.stages.named_children():
+            if name in model_args.tune_convnext_stage:
+                for param in layer.parameters():
+                    param.requires_grad = True
+
+    # check parameter info
+    # for name, param in model.named_parameters():
+    #    print(f'Layer: {name}, requires_grad: {param.requires_grad}')
 
     if training_args.bits in [4, 8]:
         model.get_model().mm_projector.to(dtype=compute_dtype, device=training_args.device)
@@ -277,11 +301,6 @@ def train():
     else:
         trainer.train()
     trainer.save_state()
-
-    #torch.save(
-    #    model.state_dict(),
-    #    f'{training_args.output_dir}/pytorch_model.bin'
-    #)
     model.config.use_cache = True
 
     if training_args.lora_enable:
